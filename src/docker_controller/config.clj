@@ -1,16 +1,10 @@
 (ns docker-controller.config)
 
 (def config
-  (let [port (if (some? (System/getenv "port"))
-               (Integer. (System/getenv "port"))
-               3000)]
-   (atom {:port port})))
+  (atom {:unix-socket "unix:///var/run/docker.sock"}))
 
 (defn init
-  "Initialize application with runtime variables"
   []
   (println "Initializing application...")
-  (swap! config
-         assoc
-         :unix-socket (System/getenv "unix-socket")
-         :docker-api-version "1.40"))
+  (if (some? (System/getenv "UNIX_SOCKET"))
+    (swap! config assoc :unix-socket (System/getenv "UNIX_SOCKET"))))
