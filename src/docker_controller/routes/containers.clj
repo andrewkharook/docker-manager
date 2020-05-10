@@ -1,7 +1,9 @@
 (ns docker-controller.routes.containers
   (:require [unixsocket-http.core :as http]
             [clojure.data.json :as json]
-            [docker-controller.config :refer [config]]))
+            [clojure.spec.alpha :as spec]
+            [docker-controller.config :refer [config]]
+            [docker-controller.response :refer [response]]))
 
 (def socket (http/client (:unix-socket @config)))
 
@@ -16,12 +18,6 @@
               (json/read-str (:body (http/get socket url)) :key-fn keyword))))
     (catch Exception e
       (ex-data e))))
-
-#_(defn container-id
-    "Get container id by name"
-    [name]
-    (:Id (first (filter #(str/includes? (first (:Names %)) name)
-                        (json/read-str (:body (list-all :nil)) :key-fn keyword)))))
 
 (defn- start
   [container]
@@ -42,7 +38,9 @@
 (defn change-state
   [request]
   (let [container (-> request :params :name)
-        action (-> request :body :action)]
+        action (spec/conform #{"start" "stop"} (-> request :body :action))]
     (case action
       "start" (start container)
-      "stop" (stop container))))
+      "stop" (stop container)
+      ::spec/invalid {:status 400
+                      :body   (json/write-str {:error "Bad request"})})))

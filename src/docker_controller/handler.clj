@@ -3,13 +3,14 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json :refer [wrap-json-body]]
-            [docker-controller.routes.containers :as containers]))
+            [docker-controller.routes.containers :as containers]
+            [clojure.data.json :as json]))
 
 (defroutes app-routes
            (context "/containers" []
              (GET "/" [] containers/list-all)
              (POST "/:name" [] containers/change-state))
-           (route/not-found "Not Found"))
+           (route/not-found (json/write-str {:error "Not found"})))
 
 (def app
   (-> app-routes
