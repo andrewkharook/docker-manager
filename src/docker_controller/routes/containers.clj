@@ -1,9 +1,10 @@
 (ns docker-controller.routes.containers
+  "Container-related routes"
   (:require [unixsocket-http.core :as http]
             [clojure.data.json :as json]
             [clojure.spec.alpha :as spec]
             [docker-controller.config :refer [config]]
-            [docker-controller.response :refer [response]]))
+            [docker-controller.routes.service :refer [error]]))
 
 (def socket (http/client (:unix-socket @config)))
 
@@ -42,5 +43,4 @@
     (case action
       "start" (start container)
       "stop" (stop container)
-      ::spec/invalid {:status 400
-                      :body   (json/write-str {:error "Bad request"})})))
+      ::spec/invalid (error "Bad request" 400))))

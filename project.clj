@@ -18,5 +18,6 @@
                        :auto-reload?  false}}
    :dev        {:dependencies [[javax.servlet/servlet-api "2.5"]
                                [ring/ring-mock "0.3.2"]]
-                :ring {:nrepl {:start? true}}}}
+                :ring {:open-browser? false
+                       :nrepl {:start? true}}}}
   :repl-options {:init-ns docker-controller.handler})
