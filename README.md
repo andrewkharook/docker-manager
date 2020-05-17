@@ -28,3 +28,17 @@ You can change these settings by setting the `PORT` and `UNIX_SOCKET` environmen
     $ PORT=8080 java -jar docker-controller.jar
     
 To me, the most convenient way to keep the app running is using some process control system, e.g. [Supervisor](http://supervisord.org). It would take care of running the app in the background and restoring it after system reboot. 
+
+## v0.1.1 update
+
+It is recommended to set the `TOKEN` env variable with a unique string to protect your API from unauthorized access:
+
+    $ TOKEN=53de47d3c01e648b4a72938a33846af8d3680dce java -jar docker-controller.jar
+
+Then, use the same string in `token` query string or payload parameter:
+
+     $ curl --request POST \
+         --url http://localhost:3000/containers/%my-awesome-app% \
+         --header 'content-type: application/json' \
+         --data '{"action": "stop", "token": "53de47d3c01e648b4a72938a33846af8d3680dce"}'
+    
