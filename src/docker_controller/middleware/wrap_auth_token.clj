@@ -7,6 +7,8 @@
   "Middleware that compares the auth token from request to the one defined in config."
   [handler]
   (fn [req]
-    (if (= (:token (:params req)) (:token @config))
-      (handler req)
-      (error "Access denied" 403))))
+    (let [req-token (or (:token (:params req))
+                        (:token (:body req)))]
+      (if (= req-token (:token @config))
+        (handler req)
+        (error "Access denied" 403)))))
