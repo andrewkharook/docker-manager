@@ -1,0 +1,118 @@
+# Clojure CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-clojure/ for more details
+#
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/clojure:lein-2.7.1
+
+    working_directory: ~/repo
+
+    environment:
+      LEIN_ROOT: "true"
+      JVM_OPTS: -Xmx3200m
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "project.clj" }}
+            - v1-dependencies-
+
+      - run: lein deps
+
+      - save_cache:
+          paths:
+            - ~/.m2
+            - ~/.lein
+          key: v1-dependencies-{{ checksum "project.clj" }}
+
+      - run: lein test
+
+  build:
+    docker:
+      - image: circleci/clojure:lein-2.7.1
+
+    working_directory: ~/repo
+
+    environment:
+      LEIN_ROOT: "true"
+      JVM_OPTS: -Xmx3200m
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "project.clj" }}
+            - v1-dependencies-
+
+      - run: lein deps
+
+      - save_cache:
+          paths:
+            - ~/.m2
+            - ~/.lein
+          key: v1-dependencies-{{ checksum "project.clj" }}
+
+      - run: lein ring uberjar
+
+      - store_artifacts:
+          path: target/docker-controller.jar
+          destination: uberjar
+
+      - run:
+          name: Move compiled jar to workspace
+          command: |
+            set -exu
+            mkdir -p /tmp/workspace
+            mv target/docker-controller.jar /tmp/workspace
+
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - docker-controller.jar
+
+  # TODO
+  #publish-github-release:
+  #    docker:
+  #      - image: cibuilds/github:0.10
+  #    steps:
+  #      - attach_workspace:
+  #          at: /tmp/workspace
+  #      - run:
+  #          name: "Publish Release on GitHub"
+  #          command: |
+  #            VERSION=$(my-binary --version)
+  #            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+
+
+workflows:
+  version: 2
+
+  commit:
+    jobs:
+      - test
+
+  release:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+
+      # TODO
+      # - publish-github-release:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         ignore: /.*/
+      #       tags:
+      #         only: /^v\d+\.\d+\.\d+$/
