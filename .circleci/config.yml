@@ -96,6 +96,9 @@ workflows:
   commit:
     jobs:
       - test
+    filters:
+      branches:
+        only: /.*/
 
   release:
     jobs:
@@ -107,12 +110,12 @@ workflows:
             tags:
               only: /^v\d+\.\d+\.\d+$/
 
-      # TODO
-      # - publish-github-release:
-      #     requires:
-      #       - build
-      #     filters:
-      #       branches:
-      #         ignore: /.*/
-      #       tags:
-      #         only: /^v\d+\.\d+\.\d+$/
+  # TODO
+  # - publish-github-release:
+  #     requires:
+  #       - build
+  #     filters:
+  #       branches:
+  #         ignore: /.*/
+  #       tags:
+  #         only: /^v\d+\.\d+\.\d+$/
