@@ -11,6 +11,7 @@
   :ring {:handler docker-controller.handler/app
          :init    docker-controller.config/init
          :port    3000}
+  :uberjar-name "docker-controller.jar"
   :profiles
   {:uberjar    {:aot :all}
    :production {:ring {:open-browser? false
