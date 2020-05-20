@@ -32,6 +32,9 @@ jobs:
 
       - run: lein test
 
+      - store_test_results:
+          path: test-results
+
   build:
     docker:
       - image: circleci/clojure:lein-2.7.1
@@ -62,7 +65,7 @@ jobs:
 
       - store_artifacts:
           path: target/docker-controller.jar
-          destination: uberjar
+          destination: docker-controller
 
       - run:
           name: Move compiled jar to workspace
@@ -106,6 +109,8 @@ workflows:
       - build:
           requires:
             - test
+          branches:
+            ignore: /.*/
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+$/
