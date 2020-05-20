@@ -96,9 +96,9 @@ workflows:
   commit:
     jobs:
       - test
-    filters:
-      branches:
-        only: /.*/
+          filters:
+            branches:
+              only: /.*/
 
   release:
     jobs:
