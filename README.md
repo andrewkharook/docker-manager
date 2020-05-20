@@ -41,4 +41,7 @@ Then, use the same string in `token` query string or payload parameter:
          --url http://localhost:3000/containers/%my-awesome-app% \
          --header 'content-type: application/json' \
          --data '{"action": "stop", "token": "53de47d3c01e648b4a72938a33846af8d3680dce"}'
-    
+
+---
+
+[![CircleCI](https://circleci.com/gh/andrewkharook/docker-manager/tree/master.svg?style=svg)](https://circleci.com/gh/andrewkharook/docker-manager/tree/master)
