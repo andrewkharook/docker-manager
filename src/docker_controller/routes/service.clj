@@ -3,6 +3,17 @@
   (:require [clojure.spec.alpha :as spec]
             [clojure.data.json :as json]))
 
+(defmacro get-version
+  "Get project version in compilation phase. Only applicable
+  to Leiningen projects."
+  []
+  `~(System/getProperty "docker-controller.version"))
+
+(defn version
+  []
+  {:status 200
+   :body   (json/write-str {:version (get-version)})})
+
 (defn error
   ([text]
    (error text 500))

@@ -5,7 +5,10 @@
             [ring.middleware.json :refer [wrap-json-body]]
             [docker-controller.middleware.wrap-auth-token :refer [wrap-auth-token]]
             [docker-controller.routes.containers :as containers]
-            [docker-controller.routes.service :refer [error]]))
+            [docker-controller.routes.service :refer [version error]]))
+
+(defroutes service-routes
+           (GET "/version" [] (version)))
 
 (defroutes app-routes
            (context "/containers" []
@@ -14,7 +17,8 @@
            (route/not-found (error "Resource not found" 404)))
 
 (def app
-  (-> app-routes
-      (wrap-auth-token)
-      (wrap-json-body {:keywords? true})
-      (wrap-defaults api-defaults)))
+  (routes service-routes
+          (-> app-routes
+              (wrap-auth-token)
+              (wrap-json-body {:keywords? true})
+              (wrap-defaults api-defaults))))

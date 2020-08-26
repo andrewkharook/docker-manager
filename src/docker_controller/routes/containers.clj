@@ -36,11 +36,20 @@
     (catch Exception e
       (ex-data e))))
 
+(defn- restart
+  [container]
+  (try
+    (let [url (str base-url "/containers/" container "/restart")]
+      (http/post socket url))
+    (catch Exception e
+      (ex-data e))))
+
 (defn change-state
   [request]
   (let [container (-> request :params :name)
-        action (spec/conform #{"start" "stop"} (-> request :body :action))]
+        action (spec/conform #{"start" "stop" "restart"} (-> request :body :action))]
     (case action
       "start" (start container)
       "stop" (stop container)
+      "restart" (restart container)
       ::spec/invalid (error "Bad request" 400))))
