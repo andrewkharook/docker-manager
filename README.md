@@ -22,14 +22,21 @@ After you've started the app, you can send some http requests to manage docker c
         --header 'content-type: application/json' \
         --data '{"action": "stop"}'
 
-By default an application runs on port `3000` and connects to docker's socket at `unix://var/run/docker.sock`
-You can change these settings by setting the `PORT` and `UNIX_SOCKET` environment variables, e.g.:
+### Available commands
 
-    $ PORT=8080 java -jar docker-controller.jar
-    
-To me, the most convenient way to keep the app running is using some process control system, e.g. [Supervisor](http://supervisord.org). It would take care of running the app in the background and restoring it after system reboot. 
+You can use following commands to juggle your containers:
 
-## v0.1.1 update
+`GET /containers` lists all rinning containers
+
+`POST /containers/%container-id%` with `{"action": "start"}` in payload starts the container
+
+`POST /containers/%container-id%` with `{"action": "restart"}` in payload restarts the container
+
+`POST /containers/%container-id%` with `{"action": "stop"}` in payload stops the container
+
+`GET /version` shows application version. Does not require security token
+
+## Securing the application
 
 It is recommended to set the `TOKEN` env variable with a unique string to protect your API from unauthorized access:
 
@@ -41,6 +48,16 @@ Then, use the same string in `token` query string or payload parameter:
          --url http://localhost:3000/containers/%my-awesome-app% \
          --header 'content-type: application/json' \
          --data '{"action": "stop", "token": "53de47d3c01e648b4a72938a33846af8d3680dce"}'
+
+## Additional settings
+
+By default an application runs on port `3000` and connects to docker's socket at `unix://var/run/docker.sock`
+You can change these settings by setting the `PORT` and `UNIX_SOCKET` environment variables, e.g.:
+
+    $ PORT=8080 java -jar docker-controller.jar
+    
+To me, the most convenient way to keep the app running is using some process control system, e.g. [Supervisor](http://supervisord.org). It would take care of running the app in the background and restoring it after system reboot. 
+
 
 ---
 
