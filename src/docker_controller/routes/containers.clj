@@ -4,7 +4,7 @@
             [clojure.data.json :as json]
             [clojure.spec.alpha :as spec]
             [docker-controller.config :refer [config]]
-            [docker-controller.routes.service :refer [error]]))
+            [docker-controller.routes.service :refer [error format-response]]))
 
 (def socket (http/client (:unix-socket @config)))
 
@@ -13,10 +13,13 @@
 (defn list-all
   [_]
   (try
-    (let [url (str base-url "/containers/json")]
-      (json/write-str
-        (mapv #(select-keys % [:Id :Names])
-              (json/read-str (:body (http/get socket url)) :key-fn keyword))))
+    (let [url (str base-url "/containers/json")
+          response (http/get socket url)]
+      (assoc response
+        :headers {"content-type" "application/json"}
+        :body (json/write-str
+                (mapv #(select-keys % [:Id :Names])
+                      (json/read-str (:body response) :key-fn keyword)))))
     (catch Exception e
       (ex-data e))))
 
@@ -24,7 +27,7 @@
   [container]
   (try
     (let [url (str base-url "/containers/" container "/start")]
-      (http/post socket url))
+      (format-response (http/post socket url)))
     (catch Exception e
       (ex-data e))))
 
@@ -32,7 +35,7 @@
   [container]
   (try
     (let [url (str base-url "/containers/" container "/stop?t=5")]
-      (http/post socket url))
+      (format-response (http/post socket url)))
     (catch Exception e
       (ex-data e))))
 
@@ -40,7 +43,7 @@
   [container]
   (try
     (let [url (str base-url "/containers/" container "/restart")]
-      (http/post socket url))
+      (format-response (http/post socket url)))
     (catch Exception e
       (ex-data e))))
 
