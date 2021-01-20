@@ -13,6 +13,7 @@
 (defroutes app-routes
            (context "/containers" []
              (GET "/" [] containers/list-all)
+             (GET "/:name" [] containers/status)
              (POST "/:name" [] containers/change-state))
            (route/not-found (error "Resource not found" 404)))
 

@@ -12,6 +12,7 @@
 (defn version
   []
   {:status 200
+   :headers {"content-type" "application/json"}
    :body   (json/write-str {:version (get-version)})})
 
 (defn error
