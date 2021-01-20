@@ -26,7 +26,9 @@ After you've started the app, you can send some http requests to manage docker c
 
 You can use following commands to juggle your containers:
 
-`GET /containers` lists all rinning containers
+`GET /containers` lists all running containers
+
+`GET /containers/%container-id%` shows the container info
 
 `POST /containers/%container-id%` with `{"action": "start"}` in payload starts the container
 

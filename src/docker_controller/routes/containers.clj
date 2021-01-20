@@ -56,3 +56,18 @@
       "stop" (stop container)
       "restart" (restart container)
       ::spec/invalid (error "Bad request" 400))))
+
+(defn status
+  [request]
+  (try
+    (let [container (-> request :params :name)
+          url (str base-url "/containers/" container "/json")
+          response (http/get socket url)]
+      (assoc response
+        :headers {"content-type" "application/json"}
+        :body (json/write-str {:status (let [status (:Status (:State (json/read-str (:body response) :key-fn keyword)))]
+                                         (if (not= status "running")
+                                           "exited"
+                                           status))})))
+    (catch Exception e
+      (ex-data e))))
